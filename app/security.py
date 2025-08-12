@@ -5,10 +5,9 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional
 
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-SECRET_KEY = "YOUR_SUPER_SECRET_KEY"
+SECRET_KEY = "YOUR_SUPER_SECRET_KEY" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

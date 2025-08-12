@@ -9,12 +9,12 @@ class BlockedSearchCreate(BlockedSearchBase):
     child_username: str
 
 class BlockedSearch(BlockedSearchBase):
-    id: int
+    id: str
     timestamp: datetime.datetime
-    child_id: int
+    child_id: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserBase(BaseModel):
     username: str
@@ -29,13 +29,13 @@ class ParentCreate(UserCreate):
     pass
 
 class User(UserBase):
-    id: int
+    id: str
     role: str
-    parent_id: Optional[int] = None
+    parent_id: Optional[str] = None
     searches: List[BlockedSearch] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str

@@ -1,5 +1,7 @@
-fastapi[all]
-sqlalchemy
-passlib[bcrypt]
-python-jose[cryptography]
-python-multipart
+fastapi==0.110.0
+uvicorn==0.29.0
+python-dotenv==1.0.1
+firebase-admin==6.2.0
+passlib==1.7.4
+bcrypt==4.1.2
+python-jose[cryptography]==3.3.0
