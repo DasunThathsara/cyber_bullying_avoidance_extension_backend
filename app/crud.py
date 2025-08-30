@@ -63,9 +63,6 @@ def get_searches_by_child(child_id: str):
     return results
 
 def delete_child_user(child_id: str):
-    """
-    Deletes a child user document and all of their associated blocked searches.
-    """
     searches_query = db.collection("searches").where("child_id", "==", child_id)
     searches_docs = searches_query.stream()
     
@@ -75,3 +72,14 @@ def delete_child_user(child_id: str):
     db.collection("users").document(child_id).delete()
     
     return True
+
+def clear_searches_by_child(child_id: str):
+    searches_query = db.collection("searches").where("child_id", "==", child_id)
+    docs = searches_query.stream()
+
+    deleted_count = 0
+    for doc in docs:
+        doc.reference.delete()
+        deleted_count += 1
+    
+    return {"status": "success", "deleted_count": deleted_count}

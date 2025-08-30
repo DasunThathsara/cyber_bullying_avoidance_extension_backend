@@ -77,16 +77,11 @@ def create_child_for_parent(
 def read_children_for_parent(current_user: dict = Depends(get_current_active_parent)):
     return crud.get_children_by_parent(current_user["id"])
 
-# NEW ENDPOINT ADDED HERE
 @app.delete("/children/{child_id}", status_code=status.HTTP_200_OK)
 def delete_child(
     child_id: str,
     current_user: dict = Depends(get_current_active_parent)
 ):
-    """
-    Delete a child account and all associated data.
-    """
-    
     child_to_delete = crud.get_user(child_id)
     if not child_to_delete:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child not found")
@@ -114,3 +109,16 @@ def read_searches_for_child(
     if not child or child.get("parent_id") != current_user["id"]:
         raise HTTPException(status_code=403, detail="Not authorized to view this child's data")
     return crud.get_searches_by_child(child_id)
+
+@app.delete("/searches/clear/{child_id}", status_code=status.HTTP_200_OK)
+def clear_child_search_history(
+    child_id: str,
+    current_user: dict = Depends(get_current_active_parent)
+):
+    child = crud.get_user(child_id)
+    if not child or child.get("parent_id") != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized to clear this child's data")
+
+    result = crud.clear_searches_by_child(child_id)
+    
+    return {"message": f"Successfully cleared {result['deleted_count']} search logs for child '{child['username']}'."}
