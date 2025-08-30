@@ -61,3 +61,17 @@ def get_searches_by_child(child_id: str):
     results = [{"id": doc.id, **doc.to_dict()} for doc in docs]
     results.sort(key=lambda x: x.get("timestamp", datetime.min), reverse=True)
     return results
+
+def delete_child_user(child_id: str):
+    """
+    Deletes a child user document and all of their associated blocked searches.
+    """
+    searches_query = db.collection("searches").where("child_id", "==", child_id)
+    searches_docs = searches_query.stream()
+    
+    for doc in searches_docs:
+        doc.reference.delete()
+        
+    db.collection("users").document(child_id).delete()
+    
+    return True

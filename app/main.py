@@ -77,6 +77,27 @@ def create_child_for_parent(
 def read_children_for_parent(current_user: dict = Depends(get_current_active_parent)):
     return crud.get_children_by_parent(current_user["id"])
 
+# NEW ENDPOINT ADDED HERE
+@app.delete("/children/{child_id}", status_code=status.HTTP_200_OK)
+def delete_child(
+    child_id: str,
+    current_user: dict = Depends(get_current_active_parent)
+):
+    """
+    Delete a child account and all associated data.
+    """
+    
+    child_to_delete = crud.get_user(child_id)
+    if not child_to_delete:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child not found")
+    
+    if child_to_delete.get("parent_id") != current_user["id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this child")
+
+    crud.delete_child_user(child_id)
+    
+    return {"message": f"Child account '{child_to_delete['username']}' and all associated data deleted successfully."}
+
 @app.post("/searches/log", response_model=schemas.BlockedSearch, status_code=status.HTTP_201_CREATED)
 def log_blocked_search(search: schemas.BlockedSearchCreate):
     logged_search = crud.create_blocked_search(search)
