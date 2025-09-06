@@ -52,6 +52,30 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.post("/users/verify-parent-for-logout")
+async def verify_parent_for_logout(data: schemas.ParentLogoutVerification):
+    child_user = crud.get_user_by_username(data.child_username)
+    if not child_user or not child_user.get("parent_id"):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Child account or associated parent not found",
+        )
+
+    parent_user = crud.get_user(child_user["parent_id"])
+    if not parent_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Parent account not found",
+        )
+
+    if not security.verify_password(data.parent_password, parent_user.get("hashed_password", "")):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect parent password",
+        )
+    
+    return {"verified": True}
+
 @app.post("/users/register", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
 def create_parent(user: schemas.ParentCreate):
     db_user = crud.get_user_by_username(user.username)

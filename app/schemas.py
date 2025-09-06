@@ -43,3 +43,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+class ParentLogoutVerification(BaseModel):
+    child_username: str
+    parent_password: str
